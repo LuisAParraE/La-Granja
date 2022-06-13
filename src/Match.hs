@@ -2,15 +2,34 @@
 
 module Match where
 
-newtype Target = T [Char]
+import Text.ParserCombinators.ReadPrec
+import Text.Read
 
-newtype Guess = G [Char]
+--newtype Target = T [Char]
+
+--newtype Guess = G [Char]
 
 data Match
   = Nada
   | Vaca
   | Toro
   deriving (Eq)
+
+instance Read Match where
+  readPrec =
+    parens
+      ( do
+          g <- get
+          if g == 'V'
+            then pure Vaca
+            else
+              if g == 'T'
+                then pure Toro
+                else
+                  if g == '-'
+                    then pure Nada
+                    else pfail
+      )
 
 instance Show Match where
   show Toro = "T"
@@ -35,3 +54,6 @@ lookVacas ((x, y) : xs) ((t, ts) : (a, as) : (r, rs) : (g, gs) : (e, es) : ws)
   | x == g && not gs = Vaca : lookVacas xs ((a, as) : (r, rs) : (g, True) : (e, es) : (t, ts) : ws)
   | x == e && not es = Vaca : lookVacas xs ((a, as) : (r, rs) : (g, gs) : (e, True) : (t, ts) : ws)
   | otherwise = y : lookVacas xs ((a, as) : (r, rs) : (g, gs) : (e, es) : (t, ts) : ws)
+
+lectura :: [Char] -> [Match]
+lectura = map (\x -> read [x])
