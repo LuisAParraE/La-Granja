@@ -13,7 +13,7 @@ data Match
   = Nada
   | Vaca
   | Toro
-  deriving (Eq)
+  deriving (Eq, Ord)
 
 instance Read Match where
   readPrec =

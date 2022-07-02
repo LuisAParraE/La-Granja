@@ -5,9 +5,7 @@ module Play where
 import Match (Match (..), checkGuess)
 import Text.ParserCombinators.ReadP (char)
 import Text.Read
-
-turnos :: Int
-turnos = 6
+import Utils (turnos)
 
 --playGame = do
 --    let word = "cazar"
