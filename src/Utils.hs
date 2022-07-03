@@ -2,6 +2,7 @@ module Utils where
 
 import GHC.IO.Handle (hClose, hGetLine, hIsEOF)
 import System.IO (IOMode (ReadMode), openFile)
+import System.Random (randomRIO)
 
 turnos :: Int
 turnos = 6
@@ -24,3 +25,7 @@ wordByWord handler wordList = do
       wordByWord handler (wordList ++ [newWord])
     else do
       return wordList
+
+ramdonSelect lista = do
+  num <- randomRIO (0, length lista -1)
+  return $ lista !! num
