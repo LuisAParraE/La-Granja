@@ -23,7 +23,7 @@ library
   hs-source-dirs:      src
   default-language:    Haskell98
 
-executable La-Granja
+executable Wordle
   main-is:             Main.hs
   -- other-modules:
   -- other-extensions:

@@ -1,20 +1,27 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
-module Play where
+module Play
+  ( playGame,
+  )
+where
 
+import Data.Char (toUpper)
 import Match (Match (..), checkGuess)
 import Text.ParserCombinators.ReadP (char)
 import Text.Read
-import Utils (turnos)
+import Utils (loadWords, randomSelect, turnos)
 
---playGame = do
---    let word = "cazar"
+playGame = do
+  allWords <- loadWords
+  palabra <- randomSelect allWords
+  gameStatus palabra 0
 
 gameStatus :: [Char] -> Int -> IO ()
 gameStatus palabra turn
   | turn < turnos = do
     adivinacion <- leerEntrada
-    let comparacion = checkGuess adivinacion palabra
+    let guess = map toUpper adivinacion
+    let comparacion = checkGuess guess palabra
     putStr "MENTEMAESTRA:"
     traverse (putStr . show) comparacion
     if elem Vaca comparacion || elem Nada comparacion
