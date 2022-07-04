@@ -6,8 +6,9 @@ module Solve
 where
 
 import Match (Match (..), checkGuess, lectura)
-import Text.Read
 import Utils (loadWords, randomSelect, turnos)
+import Text.Read
+import Minimax
 
 -- | Función a Exportar y que Inicia el estado del SOLVER
 -- Carga todas las palabras en una lista, setea el turno en 0 y elige una palabra al azar para iniciar
@@ -20,7 +21,6 @@ playSolver = do
 -- | Función que maneja el flujo del solver, muestra la palabra sugerida, y luego pide la pista.
 -- Si la pista no es completamente buena, procede a buscar una palabra a sugerir y se repite el proceso.
 -- Si se llega a más 6 turnos. Finaliza el programa.
-solveTheGame :: String -> Int -> t -> IO ()
 solveTheGame palabra turn allWords
   | turn < turnos = do
     putStr "La palabra sugerida es "
@@ -29,13 +29,18 @@ solveTheGame palabra turn allWords
     if foldr ((&&) . (== Toro)) True codigo
       then do
         putStrLn ""
-        putStrLn "Has Ganado!!!"
+        putStrLn "La IA ha ganado!"
       else do
-        nextPalabra <- getLine ---PEDRO, AQUI ES DONDE IRIA TÚ FUCIÓN, La linea seria let nextPalabra = tú función allwords codigo
-        solveTheGame nextPalabra (turn + 1) allWords
+        let nextPalabra = damePalabra allWords (palabra, codigo)
+        if nextPalabra == "TRAMPOSO"
+          then do 
+            putStrLn ""
+            putStrLn "Has sido un tramposo, la IA gana! :c"
+          else do
+            solveTheGame nextPalabra (turn + 1) allWords
   | turn >= turnos = do
     putStrLn ""
-    putStrLn "Has Perdido!!! :c"
+    putStrLn "La IA ha perdido! :c"
 
 -- | Función encargada de leer la entrada, verificar si es posible dicha entrada. Y luego convertirla en un tipo de dato Match,
 -- que es el codigo utilizado para las palabras.
