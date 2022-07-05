@@ -4,6 +4,7 @@ import Play (playGame)
 import Solve (playSolver)
 import System.Environment
 
+-- | Programa principal, se inicia con mentemaestra o decifrador. Sino da error e imprime su uso.
 main :: IO ()
 main = do
   f <- getArgs

@@ -7,6 +7,7 @@ where
 
 import Data.Char (toUpper)
 import Match (Match (..), checkGuess)
+import System.IO
 import Text.ParserCombinators.ReadP (char)
 import Text.Read
 import Utils (loadWords, randomSelect, turnos)
@@ -23,21 +24,27 @@ gameStatus palabra turn
     let guess = map toUpper adivinacion
     let comparacion = checkGuess guess palabra
     putStr "MENTEMAESTRA:"
+    hFlush stdout
     traverse (putStr . show) comparacion
     if elem Vaca comparacion || elem Nada comparacion
       then do
         putStrLn ""
         gameStatus palabra (turn + 1)
-      else putStrLn "Ganaste!!!"
+      else do
+        putStrLn "Ganaste!!!"
+        hFlush stdout
   | turn >= turnos = do
     putStrLn ""
     putStr "La palabra era "
+    hFlush stdout
     putStrLn palabra
+    hFlush stdout
 
 --leerEntrada :: IO [Char]
 leerEntrada :: IO String
 leerEntrada = do
   putStr "DECIFRADOR:"
+  hFlush stdout
   entrada <- getLine
   if length entrada /= 5
     then leerEntrada

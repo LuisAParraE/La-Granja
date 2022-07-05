@@ -6,9 +6,10 @@ module Solve
 where
 
 import Match (Match (..), checkGuess, lectura)
-import Utils (loadWords, randomSelect, turnos)
-import Text.Read
 import Minimax
+import System.IO
+import Text.Read
+import Utils (loadWords, randomSelect, turnos)
 
 -- | Función a Exportar y que Inicia el estado del SOLVER
 -- Carga todas las palabras en una lista, setea el turno en 0 y elige una palabra al azar para iniciar
@@ -24,29 +25,38 @@ playSolver = do
 solveTheGame palabra turn allWords
   | turn < turnos = do
     putStr "La palabra sugerida es "
+    hFlush stdout
     putStrLn palabra
+    hFlush stdout
     codigo <- leerEntradaSolver
     if foldr ((&&) . (== Toro)) True codigo
       then do
         putStrLn ""
+        hFlush stdout
         putStrLn "La IA ha ganado!"
+        hFlush stdout
       else do
         let nextPalabra = damePalabra allWords (palabra, codigo)
         if nextPalabra == "TRAMPOSO"
-          then do 
+          then do
             putStrLn ""
+            hFlush stdout
             putStrLn "Has sido un tramposo, la IA gana! :c"
+            hFlush stdout
           else do
             solveTheGame nextPalabra (turn + 1) allWords
   | turn >= turnos = do
     putStrLn ""
+    hFlush stdout
     putStrLn "La IA ha perdido! :c"
+    hFlush stdout
 
 -- | Función encargada de leer la entrada, verificar si es posible dicha entrada. Y luego convertirla en un tipo de dato Match,
 -- que es el codigo utilizado para las palabras.
 leerEntradaSolver :: IO [Match]
 leerEntradaSolver = do
   putStr "PISTA:"
+  hFlush stdout
   entrada <- getLine
   let adivinacion = lectura entrada
   if length entrada /= 5
