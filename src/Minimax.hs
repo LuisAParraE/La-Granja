@@ -4,9 +4,11 @@ module Minimax (damePalabra) where
 import Match
 import Data.List
 
+-- | Representa una pista del juego
 type Combinacion = [Match]
 type Adivinacion = (String, Combinacion)
 
+-- | Tupla que contiene un valor y una puntuacion
 newtype TuplaPuntuada v =
     TP (v, Float)
     deriving (Show)
@@ -18,11 +20,12 @@ instance Ord (TuplaPuntuada v) where
   (TP (_, s)) `compare` (TP (_, s2)) = s `compare` s2
 
 
+-- | Tipo que representa un arbol
 data Arbol v =
       Hoja
     | Nodo v (Arbol v) [Arbol v]
 
-  deriving (Show, Eq, Read)
+  deriving (Show)
 
 -- | Calcula el valor de una letra
 letterValue :: Char   -- ^ Caracter a calcular valor
@@ -58,7 +61,7 @@ scoreTip x = 1.0 - sum (map matchValue x)
   Filtra las palabras que sean compatibles con una
   adivinacion.
 -}
-soloPalCompat :: [String]
+soloPalCompat :: [String]         -- ^ Palabras ya usadas
               -> [String]         -- ^ Palabras a testear
               -> Adivinacion      -- ^ Adivinacion a usar
               -> [String]         -- ^ Palabras compatibles
@@ -116,11 +119,13 @@ vacasBienPal :: String          -- ^ Palabra a probar
               -> Bool           -- True la palabra es compatible con las vacas de la adiv.
 vacasBienPal x y = noVacasIgual x y && vacasMantenidas x y
 
--- NO DEBERIA SER SOLO VACAS? REVISAAAR
 {-|
-  
+  Se asegura que no haya ningun caracter extra en una palabra
+  respecto a una adivinacion 
 -}
-ningBienPal :: String -> Adivinacion -> Bool
+ningBienPal :: String         -- ^ Palabra a probar
+            -> Adivinacion    -- ^ Adivinacion anterior
+            -> Bool           -- ^ True si la palabra es compatible con la adivinacion. False en caso contrario
 ningBienPal x (y, z) = all (\(h,i) -> (i /= Nada) || (countCharVacasToros h (y, z) == countChar h x)) (zip y z)
 
 {-|
@@ -169,8 +174,6 @@ tieneVacaToro :: Char                 -- ^ Caracter a buscar
 tieneVacaToro c (w, t) = (com /= t, (w, com))
   where com = buscaQuitaVT c (w, t)
 
--- Nueva adiv y vieja adiv
--- Cambia es la nueva adivinacion
 {-|
   Revisa que las vacas de una posible adivinacion, sean compatibles 
   con una adivinacion anterior
@@ -204,7 +207,6 @@ combCompat :: Adivinacion         -- ^ Nueva adivinacion
             -> Bool               -- ^ True si la nueva adivinacion es compatible con la vieja
 combCompat (x, y) (z, w) a = mismosToros y w && vacasBienCom (x, y) (z, w) && not (combAntes a y)
 
--- nueva palabra padre
 {-|
   Crea los nodos hijos de una palabra. Prueba todas las combinaciones
   posibles y revisa compatibilidad con ellos. Asume que la palabra ya
@@ -217,13 +219,13 @@ crearNodosPalabra nw (Nodo v p c) = [Nodo (nw, b) (Nodo v p c) [] | (TP (b, _)) 
   where bestComb = take 10 (reverse (sort [TP (b, scoreTip b) | b <- allCombs, combCompat (nw, b) v (Nodo v p c)]))
 crearNodosPalabra _ _ = []
 
---Raiz o papa, lista de palabras permitidas
 {-|
+  Crea un subnivel del arbol
 -}
-crearNivelArbol :: [String]
-                  -> Arbol Adivinacion
-                  -> [String]
-                  -> [Arbol Adivinacion]
+crearNivelArbol :: [String]               -- ^ Palabras ya usadas en rondas anteriores
+                  -> Arbol Adivinacion    -- ^ Raiz del arbol
+                  -> [String]             -- ^ Palabras posibles a usar
+                  -> [Arbol Adivinacion]  -- ^ Hijos de la raiz
 crearNivelArbol _ _ [] = []
 crearNivelArbol _ Hoja _ = []
 crearNivelArbol ant (Nodo v p _) dic = concat hijosRes
@@ -233,20 +235,21 @@ crearNivelArbol ant (Nodo v p _) dic = concat hijosRes
     hijosRes = [crearNodosPalabra w (Nodo v p []) | (TP (w, _)) <- palPosibles]
 
 {-|
+  Crea el arbol minimax
 -}
-crearArbol :: [String]
-            -> [String]
-            -> Adivinacion
-            -> Arbol Adivinacion
+crearArbol :: [String]            -- ^ Palabras ya usadas en rondas anteriores
+            -> [String]           -- ^ Palabras posibles a usar
+            -> Adivinacion        -- ^ Adivinacion anterior
+            -> Arbol Adivinacion  -- ^ Arbol minimax
 crearArbol ant pals ad = Nodo ad Hoja ([Nodo hv hp (crearNivelArbol ant (Nodo hv hp cs) pals) | (Nodo hv hp cs) <- hijos])
   where
     hijos = crearNivelArbol ant (Nodo ad Hoja []) pals
 
 {-|
-  
+  Calcula el valor de la rama con menor valor
 -}
-nodoMinimo :: Arbol Adivinacion
-            -> Float
+nodoMinimo :: Arbol Adivinacion   -- ^ Raiz del arbol a examinar
+            -> Float              -- ^ Valor de la rama co menor valor
 nodoMinimo (Nodo (a,b) _ []) = scoreWord a + scoreTip b
 nodoMinimo (Nodo (a,b) _ cs) = scoreWord a + scoreTip b + minimum [nodoMinimo c | c <- cs]
 nodoMinimo Hoja = 0.0
@@ -263,8 +266,8 @@ palabraFinal Hoja = ""
   mediante el arbol minimax se elige una palabra para 
   adivinar de vuelta.
 -}
-damePalabra :: [String]
-              ->[String]       -- ^ Palabras posibles a usar
+damePalabra :: [String]       -- ^ Palabras ya usadas en rondas anteriores
+              ->[String]      -- ^ Palabras posibles a usar
               -> Adivinacion  -- ^ Adivinacion anterior
               -> String       -- ^ Palabra final. Si la palabra es TRAMPOSO, el jugador hizo trampa.
 damePalabra ant p a = palabraFinal (crearArbol ant p a)
