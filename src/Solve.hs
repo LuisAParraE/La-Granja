@@ -36,7 +36,7 @@ solveTheGame palabra turn allWords usedWords
         putStrLn "La IA ha ganado!"
         hFlush stdout
       else do
-        let nextPalabra = damePalabra allWords (palabra, codigo)
+        let nextPalabra = damePalabra usedWords allWords (palabra, codigo)
         if nextPalabra == "TRAMPOSO"
           then do
             putStrLn ""
