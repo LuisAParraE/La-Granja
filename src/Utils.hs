@@ -1,9 +1,4 @@
-module Utils
-  ( turnos,
-    loadWords,
-    randomSelect,
-  )
-where
+module Utils where
 
 import GHC.IO.Handle (hClose, hGetLine, hIsEOF)
 import System.IO (IOMode (ReadMode), openFile)

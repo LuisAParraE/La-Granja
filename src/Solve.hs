@@ -1,9 +1,6 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
-module Solve
-  ( playSolver,
-  )
-where
+module Solve where
 
 import Match (Match (..), checkGuess, lectura)
 import Minimax

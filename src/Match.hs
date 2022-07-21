@@ -1,11 +1,6 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 
-module Match
-  ( Match (..),
-    checkGuess,
-    lectura,
-  )
-where
+module Match where
 
 import Text.ParserCombinators.ReadPrec
 import Text.Read
