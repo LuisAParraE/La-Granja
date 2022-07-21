@@ -24,7 +24,7 @@ library
   default-language:    Haskell98
 
 executable Wordle
-  main-is:             Main.hs
+  main-is:             Wordle.hs
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.12 && <4.13, random
