@@ -1,4 +1,4 @@
-module Wordle where
+module Main where
 
 import Play (playGame)
 import Solve (playSolver)
